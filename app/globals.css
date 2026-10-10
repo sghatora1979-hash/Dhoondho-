@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background: #ffffff;
+  color: #1f2937;
+  font-family: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* subtle link style for result titles */
+.result-title {
+  color: #1a0dab;
+}
+.result-title:visited {
+  color: #660099;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Dhoondho "living logo" wordmark ---------- */
+/* Registered colour properties so theme swaps interpolate smoothly
+   (graceful instant swap in browsers without @property support). */
+@property --logo-c1 { syntax: '<color>'; inherits: true; initial-value: #FF9A3D; }
+@property --logo-c2 { syntax: '<color>'; inherits: true; initial-value: #FF4D88; }
+@property --logo-c3 { syntax: '<color>'; inherits: true; initial-value: #FFC93C; }
+@property --logo-edge { syntax: '<color>'; inherits: true; initial-value: #B34A00; }
+@property --logo-dark { syntax: '<color>'; inherits: true; initial-value: #7A2D00; }
+
+.wordmark-3d {
+  transition:
+    --logo-c1 1.2s ease,
+    --logo-c2 1.2s ease,
+    --logo-c3 1.2s ease,
+    --logo-edge 1.2s ease,
+    --logo-dark 1.2s ease;
+}
+
+/* The giant D — ~1.6x the size of the other letters */
+.wordmark-big-d {
+  font-size: 1.6em;
+}
+
+/* Glossy gradient face (top layer) */
+.wordmark-face {
+  background: linear-gradient(var(--logo-grad-angle, 180deg), var(--logo-c1) 0%, var(--logo-c2) 52%, var(--logo-c3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Duotone split face — hard two-colour divide */
+.wordmark-face-duotone {
+  background: linear-gradient(var(--logo-grad-angle, 135deg), var(--logo-c1) 0 50%, var(--logo-c3) 50% 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Rainbow flow face — animated drifting rainbow */
+.wordmark-face-rainbow {
+  background: linear-gradient(90deg, var(--logo-c1), var(--logo-c2), var(--logo-c3), var(--logo-c1));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: wordmark-rainbow 6s linear infinite;
+}
+
+@keyframes wordmark-rainbow {
+  to { background-position: 300% 0; }
+}
+
+/* Chrome face — metallic bands */
+.wordmark-face-chrome {
+  background: linear-gradient(180deg,
+    var(--logo-c3) 0%, #ffffff 18%, var(--logo-c1) 36%,
+    var(--logo-c2) 54%, var(--logo-dark) 74%, var(--logo-c1) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Neon glow around the letterforms */
+.wordmark-glow {
+  filter: drop-shadow(0 0 var(--logo-glow-blur, 18px) color-mix(in srgb, var(--logo-glow, #ffffff) 65%, transparent));
+}
+
+/* Extruded 3D body (middle layer, same glyphs, solid darker colour) */
+.wordmark-extrude {
+  color: var(--logo-edge);
+  text-shadow:
+    1px 1px 0 var(--logo-dark),
+    2px 2px 0 var(--logo-dark),
+    3px 3px 0 var(--logo-dark),
+    4px 4px 0 var(--logo-dark),
+    5px 5px 0 var(--logo-dark),
+    7px 9px 14px rgba(0, 0, 0, 0.28);
+}
+
+/* Deep extrusion — taller 3D body */
+.wordmark-extrude-deep {
+  color: var(--logo-edge);
+  text-shadow:
+    1px 1px 0 var(--logo-dark),
+    2px 2px 0 var(--logo-dark),
+    3px 3px 0 var(--logo-dark),
+    4px 4px 0 var(--logo-dark),
+    5px 5px 0 var(--logo-dark),
+    6px 6px 0 var(--logo-dark),
+    7px 7px 0 var(--logo-dark),
+    8px 8px 0 var(--logo-dark),
+    10px 12px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Soft float — shallow body with a floating drop shadow */
+.wordmark-extrude-soft {
+  color: var(--logo-edge);
+  text-shadow:
+    1px 1px 0 var(--logo-dark),
+    2px 2px 0 var(--logo-dark),
+    0 12px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Outline pop — bold dark outline around the 3D body */
+.wordmark-outline .wordmark-extrude {
+  -webkit-text-stroke: 2px var(--logo-dark);
+  paint-order: stroke fill;
+}
+
+/* Animated shine sweep clipped to the letterforms (top layer) */
+.wordmark-shine {
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.55) 47%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.55) 53%,
+    transparent 58%
+  );
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: wordmark-shine var(--logo-shine-duration, 7s) ease-in-out infinite;
+  opacity: var(--logo-shine-opacity, 1);
+}
+
+@keyframes wordmark-shine {
+  0% { background-position: 100% 0; }
+  45% { background-position: 0% 0; }
+  100% { background-position: 0% 0; }
+}
+
+/* ---------- Falling petals (flowering-tree ambience) ---------- */
+.petal {
+  position: absolute;
+  top: -6%;
+  border-radius: 100% 4% 100% 4%;
+  animation-name: petal-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: top, transform;
+}
+
+@keyframes petal-fall {
+  0% {
+    top: -6%;
+    transform: translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  8% { opacity: 0.85; }
+  50% {
+    transform: translateX(var(--sway, 26px)) rotate(200deg);
+    opacity: 0.85;
+  }
+  92% { opacity: 0.5; }
+  100% {
+    top: 104%;
+    transform: translateX(calc(var(--sway, 26px) * -0.6)) rotate(380deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petals-layer { display: none; }
+}
