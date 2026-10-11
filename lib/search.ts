@@ -7,7 +7,7 @@ export type SearchResultItem = {
   snippet: string;
 };
 
-export type Provider = 'brave' | 'google' | 'demo';
+export type Provider = 'brave' | 'tavily' | 'google' | 'demo';
 
 export type SearchResponse = {
   items: SearchResultItem[];
@@ -18,13 +18,15 @@ export type SearchResponse = {
 };
 
 const K_BRAVE = 'dhoondho-brave-key';
+const K_TAVILY = 'dhoondho-tavily-key';
 const K_GKEY = 'dhoondho-google-key';
 const K_GCX = 'dhoondho-google-cx';
 
-function readKeys(): { brave: string; gkey: string; gcx: string } {
-  if (typeof window === 'undefined') return { brave: '', gkey: '', gcx: '' };
+function readKeys(): { brave: string; tavily: string; gkey: string; gcx: string } {
+  if (typeof window === 'undefined') return { brave: '', tavily: '', gkey: '', gcx: '' };
   return {
     brave: localStorage.getItem(K_BRAVE) || '',
+    tavily: localStorage.getItem(K_TAVILY) || '',
     gkey: localStorage.getItem(K_GKEY) || '',
     gcx: localStorage.getItem(K_GCX) || '',
   };
@@ -65,6 +67,44 @@ async function braveSearch(
     totalResults: String(data?.web?.totalResults ?? items.length * page),
     demo: false,
     provider: 'brave',
+  };
+}
+
+/** Tavily: free tier (1,000 searches/month), no credit card needed. */
+async function tavilySearch(
+  query: string,
+  key: string,
+  page: number,
+  lang: Lang
+): Promise<SearchResponse> {
+  const res = await fetch('https://api.tavily.com/search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      query,
+      max_results: 10,
+      search_depth: 'basic',
+      include_answer: false,
+      include_raw_content: false,
+    }),
+  });
+  if (!res.ok) throw new Error(`Tavily API error ${res.status}`);
+  const data = await res.json();
+  const raw = data?.results ?? [];
+  const items: SearchResultItem[] = raw.map((r: Record<string, string>) => ({
+    title: r.title || '',
+    url: r.url || '',
+    displayUrl: hostOf(r.url || ''),
+    snippet: r.content || '',
+  }));
+  return {
+    items,
+    totalResults: String(items.length * page),
+    demo: false,
+    provider: 'tavily',
   };
 }
 
@@ -180,11 +220,18 @@ export async function searchWeb(
 ): Promise<SearchResponse> {
   const page = Math.max(1, opts.page ?? 1);
   const lang = opts.lang ?? 'en';
-  const { brave, gkey, gcx } = readKeys();
+  const { brave, tavily, gkey, gcx } = readKeys();
 
   if (brave) {
     try {
       return await braveSearch(query, brave, page, lang);
+    } catch {
+      // fall through to next provider
+    }
+  }
+  if (tavily) {
+    try {
+      return await tavilySearch(query, tavily, page, lang);
     } catch {
       // fall through to next provider
     }
@@ -199,4 +246,4 @@ export async function searchWeb(
   return demoResults(query, page);
 }
 
-export const KEY_NAMES = { K_BRAVE, K_GKEY, K_GCX };
+export const KEY_NAMES = { K_BRAVE, K_TAVILY, K_GKEY, K_GCX };
