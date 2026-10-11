@@ -10,12 +10,14 @@ import { KEY_NAMES } from '@/lib/search';
 export default function SettingsPage() {
   const { t } = useLang();
   const [brave, setBrave] = useState('');
+  const [tavily, setTavily] = useState('');
   const [gkey, setGkey] = useState('');
   const [gcx, setGcx] = useState('');
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
     setBrave(localStorage.getItem(KEY_NAMES.K_BRAVE) || '');
+    setTavily(localStorage.getItem(KEY_NAMES.K_TAVILY) || '');
     setGkey(localStorage.getItem(KEY_NAMES.K_GKEY) || '');
     setGcx(localStorage.getItem(KEY_NAMES.K_GCX) || '');
   }, []);
@@ -35,6 +37,16 @@ export default function SettingsPage() {
     setBrave('');
     flash(t.cleared);
   };
+  const saveTavily = () => {
+    if (tavily.trim()) localStorage.setItem(KEY_NAMES.K_TAVILY, tavily.trim());
+    else localStorage.removeItem(KEY_NAMES.K_TAVILY);
+    flash(t.saved);
+  };
+  const clearTavily = () => {
+    localStorage.removeItem(KEY_NAMES.K_TAVILY);
+    setTavily('');
+    flash(t.cleared);
+  };
   const saveGoogle = () => {
     if (gkey.trim()) localStorage.setItem(KEY_NAMES.K_GKEY, gkey.trim());
     else localStorage.removeItem(KEY_NAMES.K_GKEY);
@@ -51,6 +63,7 @@ export default function SettingsPage() {
   };
 
   const braveOn = brave.trim().length > 0;
+  const tavilyOn = tavily.trim().length > 0;
   const googleOn = gkey.trim().length > 0 && gcx.trim().length > 0;
 
   return (
@@ -68,8 +81,59 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Brave */}
+        {/* Tavily — recommended: free, no credit card */}
         <section className="mt-8 bg-gray-50 border border-gray-200 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <KeyRound size={18} className="text-saffron-dark" />
+              {t.tavilyTitle}
+            </h2>
+            <span className={`flex items-center gap-1.5 text-xs font-medium ${tavilyOn ? 'text-green-700' : 'text-gray-400'}`}>
+              {tavilyOn ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+              {tavilyOn ? t.configured : t.notConfigured}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">{t.tavilyDesc}</p>
+          <label className="block mt-4">
+            <span className="text-sm font-medium text-gray-700">{t.tavilyKeyLabel}</span>
+            <input
+              type="password"
+              value={tavily}
+              onChange={(e) => setTavily(e.target.value)}
+              placeholder={t.tavilyKeyPh}
+              className="mt-1.5 w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-saffron/40"
+              autoComplete="off"
+            />
+          </label>
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              onClick={saveTavily}
+              className="flex items-center gap-1.5 bg-saffron hover:bg-saffron-dark text-white text-sm font-semibold px-5 py-2.5 rounded-full transition"
+            >
+              <Save size={15} />
+              {t.save}
+            </button>
+            <button
+              onClick={clearTavily}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 px-3 py-2.5"
+            >
+              <Trash2 size={15} />
+              {t.clear}
+            </button>
+            <a
+              href="https://tavily.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto flex items-center gap-1 text-sm text-saffron-dark hover:underline"
+            >
+              {t.getTavily}
+              <ExternalLink size={13} />
+            </a>
+          </div>
+        </section>
+
+        {/* Brave */}
+        <section className="mt-5 bg-gray-50 border border-gray-200 rounded-2xl p-5 sm:p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-gray-900 flex items-center gap-2">
               <KeyRound size={18} className="text-saffron-dark" />
